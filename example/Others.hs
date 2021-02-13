@@ -19,17 +19,17 @@ import           Control.Monad.IO.Class (liftIO)
 import qualified Data.ByteString.Char8 as BC
 import           Data.Functor ((<&>), void)
 import           Data.Maybe (isNothing)
-import           Data.Witherable (catMaybes)
 import qualified Network.Socket as NS
 import           Reflex
 import           Reflex.Backend.Socket
-import           Reflex.Host.Basic (basicHostForever, basicHostWithQuit)
+import           Reflex.Host.Headless
 import           Reflex.Network (networkHold)
 import           System.Environment (getArgs)
+import           Witherable (catMaybes)
 
 -- | Connect to a remote host, and quit as soon as something happens.
 connect1 :: IO ()
-connect1 = basicHostWithQuit $ do
+connect1 = runHeadlessApp $ do
   eQuit <- connect (Just "127.0.0.1") "9000"
   let (eError, eConnect) = fanEither eQuit
 
@@ -41,7 +41,7 @@ connect1 = basicHostWithQuit $ do
 -- | Listen for connections, and log them as they come in. Does
 -- nothing with arriving connections, so will leak FDs.
 accept1 :: IO ()
-accept1 = basicHostForever $ do
+accept1 = runHeadlessApp $ do
   (eListenError, eAccept) <- fanEither <$> accept
     (AcceptConfig (Just "127.0.0.1") (Just "9000") 1 [(NS.ReuseAddr, 1)] never)
 
@@ -55,12 +55,12 @@ accept1 = basicHostForever $ do
   performEvent_ $ (liftIO . putStrLn $ "Connected") <$ eNewClient
   performEvent_ $ liftIO . print <$> eAcceptError
 
-  pure ()
+  pure never
 
 -- | Connect to a remote host. When the connection succeeds, put the
 -- @'Socket' t@ into @dSocket@, send a message, then close.
 connect2 :: IO ()
-connect2 = basicHostWithQuit $ mdo
+connect2 = runHeadlessApp $ mdo
   (eConnError, eConnect) <- fanEither <$> connect (Just "127.0.0.1") "9000"
 
   performEvent_ $ (liftIO . putStrLn $ "Connected") <$ eConnect

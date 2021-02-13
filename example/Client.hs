@@ -20,7 +20,7 @@ import qualified Data.ByteString.Char8 as BC
 import qualified Network.Socket as NS
 import           Reflex
 import           Reflex.Backend.Socket
-import           Reflex.Host.Basic
+import           Reflex.Host.Headless
 import           Reflex.Workflow
 
 type ClientCxt t m =
@@ -54,6 +54,6 @@ connected s = Workflow $ mdo
   pure (eQuit, unconnected <$ eQuit)
 
 main :: IO ()
-main = basicHostWithQuit $ do
+main = runHeadlessApp $ do
   deQuit <- workflow unconnected
   pure (switchDyn deQuit)

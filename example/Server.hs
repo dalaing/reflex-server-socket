@@ -30,7 +30,7 @@ import qualified Data.Map as Map
 import qualified Network.Socket as NS
 import           Reflex
 import           Reflex.Backend.Socket
-import           Reflex.Host.Basic
+import           Reflex.Host.Headless
 import           System.IO.Error
 
 type ServerCxt t m =
@@ -62,7 +62,7 @@ perConnection dSocket eTx = mdo
 
   pure (eOut, eShutdown, _sClose so)
 
-go :: forall t m. BasicGuestConstraints t m => BasicGuest t m (Event t ())
+go :: forall t m. MonadHeadlessApp t m => m (Event t ())
 go = mdo
   (eListenError, eAccept) <- fanEither <$> accept
     (AcceptConfig (Just "127.0.0.1") (Just "9000") 1 [(NS.ReuseAddr, 1)] eQuit)
@@ -121,4 +121,4 @@ go = mdo
   pure eQuit
 
 main :: IO ()
-main = basicHostWithQuit go
+main = runHeadlessApp go

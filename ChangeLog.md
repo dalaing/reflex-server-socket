@@ -1,5 +1,11 @@
 # Revision history for reflex-backend-socket
 
+## 0.2.0.1  -- Unreleased
+
+* Raised some upper bounds
+* Examples now use `Reflex.Host.Headless` from `reflex` instead of
+  `reflex-basic-host`.
+
 ## 0.2.0.0  -- 2019-10-29 (first hackage release)
 
 * Decoupled reflex-binary from this library. If you want incremental
